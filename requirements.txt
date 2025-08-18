@@ -1,0 +1,13 @@
+# /florist-crm/requirements.txt
+
+# For the web server and API framework
+fastapi
+uvicorn[standard]
+
+# For the database connection and ORM
+sqlalchemy
+psycopg2-binary
+
+# For data validation and settings management
+pydantic
+pydantic-settings
