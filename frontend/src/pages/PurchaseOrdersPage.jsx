@@ -1,7 +1,7 @@
 // frontend/src/pages/PurchaseOrdersPage.jsx
 import React from 'react';
-import PurchaseOrderForm from '../components/PurchaseOrderForm';
-import './PurchaseOrdersPage.css'; // Optional: for styling
+import PurchaseOrderForm from '../components/PurchaseOrderForm.jsx';
+// import './PurchaseOrdersPage.css'; // Optional: for styling
 
 function PurchaseOrdersPage() {
   return (
