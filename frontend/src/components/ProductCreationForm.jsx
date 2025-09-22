@@ -1,23 +1,41 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
-function ProductCreationForm() {
-  // State for the master list of components
-  const [masterComponents, setMasterComponents] = useState([]);
-  
-  // State for the new product
-  const [productName, setProductName] = useState('');
-  const [productPrice, setProductPrice] = useState(0.0);
-  const [recipeItems, setRecipeItems] = useState([
-    { component_id: '', quantity: 1 }
-  ]);
+// --- MUI Imports ---
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Paper,
+  Grid,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  IconButton,
+  CircularProgress
+} from '@mui/material';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 
-  // Fetch master components when the component loads
+function ProductCreationForm() {
+  const [masterComponents, setMasterComponents] = useState([]);
+  const [productName, setProductName] = useState('');
+  const [productPrice, setProductPrice] = useState('');
+  const [recipeItems, setRecipeItems] = useState([{ component_id: '', quantity: 1 }]);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchComponents = async () => {
-      // You would need to create this GET /api/components/ endpoint
-      const response = await api.get('/components/'); 
-      setMasterComponents(response.data);
+      try {
+        const response = await api.get('/components/'); 
+        setMasterComponents(response.data);
+      } catch (error) {
+        console.error("Failed to fetch components", error);
+      }
     };
     fetchComponents();
   }, []);
@@ -32,10 +50,14 @@ function ProductCreationForm() {
     setRecipeItems([...recipeItems, { component_id: '', quantity: 1 }]);
   };
 
+  const removeRecipeItem = (index) => {
+    const newItems = recipeItems.filter((_, i) => i !== index);
+    setRecipeItems(newItems);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    // Assemble the payload in the new format
+    setIsLoading(true);
     const newProductData = {
       name: productName,
       sale_price: parseFloat(productPrice),
@@ -46,62 +68,117 @@ function ProductCreationForm() {
     };
 
     try {
-      // Send it to the POST /api/products/ endpoint
       await api.post('/products/', newProductData);
       alert('New product created successfully!');
+      navigate('/products'); // Redirect to the product list page
     } catch (err) {
       alert('Failed to create product.');
+      setIsLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Create New Product Recipe</h2>
-      <input 
-        type="text" 
-        value={productName} 
-        onChange={(e) => setProductName(e.target.value)} 
-        placeholder="Product Name (e.g., Hand Bouquet Type A)"
-        required 
-      />
-      <input 
-        type="number" 
-        value={productPrice} 
-        onChange={(e) => setProductPrice(e.target.value)} 
-        placeholder="Sale Price"
-        step="0.01" 
-        required 
-      />
+    <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
+      <Box component="form" onSubmit={handleSubmit}>
+        <Typography variant="h5" component="h2" sx={{ mb: 3 }}>
+          Product Details
+        </Typography>
+        <Grid container spacing={3}>
+          <Grid xs={12} sm={8}>
+            <TextField
+              fullWidth
+              label="Product Name"
+              value={productName}
+              onChange={(e) => setProductName(e.target.value)}
+              required
+            />
+          </Grid>
+          <Grid xs={12} sm={4}>
+            <TextField
+              fullWidth
+              label="Sale Price"
+              type="number"
+              value={productPrice}
+              onChange={(e) => setProductPrice(e.target.value)}
+              required
+            />
+          </Grid>
+        </Grid>
 
-      <h3>Recipe Components</h3>
-      {recipeItems.map((item, index) => (
-        <div key={index}>
-          <select 
-            name="component_id" 
-            value={item.component_id} 
-            onChange={(e) => handleRecipeItemChange(index, e)} 
-            required
+        <Typography variant="h5" component="h2" sx={{ my: 3 }}>
+          Recipe Components
+        </Typography>
+
+        {recipeItems.map((item, index) => (
+          <Grid container spacing={2} key={index} sx={{ mb: 2, alignItems: 'center' }}>
+            <Grid xs={7}>
+              <FormControl fullWidth>
+                <InputLabel>Component</InputLabel>
+                <Select
+                  name="component_id"
+                  value={item.component_id}
+                  label="Component"
+                  onChange={(e) => handleRecipeItemChange(index, e)}
+                  required
+                >
+                  {masterComponents.map(comp => (
+                    <MenuItem key={comp.id} value={comp.id}>{comp.name}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid xs={3}>
+              <TextField
+                fullWidth
+                label="Quantity"
+                name="quantity"
+                type="number"
+                value={item.quantity}
+                onChange={(e) => handleRecipeItemChange(index, e)}
+                required
+              />
+            </Grid>
+            <Grid xs={2}>
+              <IconButton onClick={() => removeRecipeItem(index)} color="error">
+                <RemoveCircleOutlineIcon />
+              </IconButton>
+            </Grid>
+          </Grid>
+        ))}
+        
+        <Button
+          startIcon={<AddCircleOutlineIcon />}
+          onClick={addRecipeItem}
+          sx={{ mt: 1 }}
+        >
+          Add Component
+        </Button>
+
+        <Box sx={{ mt: 4, position: 'relative' }}>
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
+            disabled={isLoading}
           >
-            <option value="">Select a Component</option>
-            {masterComponents.map(comp => (
-              <option key={comp.id} value={comp.id}>{comp.name}</option>
-            ))}
-          </select>
-          <input 
-            type="number" 
-            name="quantity" 
-            value={item.quantity} 
-            onChange={(e) => handleRecipeItemChange(index, e)} 
-            placeholder="Quantity" 
-            min="1"
-            required 
-          />
-        </div>
-      ))}
-      <button type="button" onClick={addRecipeItem}>+ Add Component</button>
-      <hr />
-      <button type="submit">Save New Product</button>
-    </form>
+            Save New Product
+          </Button>
+          {isLoading && (
+            <CircularProgress
+              size={24}
+              sx={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                marginTop: '-12px',
+                marginLeft: '-12px',
+              }}
+            />
+          )}
+        </Box>
+      </Box>
+    </Paper>
   );
 }
 

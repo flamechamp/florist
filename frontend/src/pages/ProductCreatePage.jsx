@@ -1,17 +1,22 @@
 import React from 'react';
 import ProductCreationForm from '../components/ProductCreationForm.jsx';
 
+// --- MUI Imports ---
+import { Container, Typography, Box } from '@mui/material';
+
 function ProductCreatePage() {
   return (
-    <div>
-      <header>
-        <h1>Create New Product Recipe</h1>
-        <p>Define a new product and the components required to make it.</p>
-      </header>
-      <main>
-        <ProductCreationForm />
-      </main>
-    </div>
+    <Container maxWidth="md">
+      <Box sx={{ my: 4 }}>
+        <Typography variant="h4" component="h1" gutterBottom>
+          Create New Product
+        </Typography>
+        <Typography variant="subtitle1">
+          Define a new product and the components required to make it.
+        </Typography>
+      </Box>
+      <ProductCreationForm />
+    </Container>
   );
 }
 

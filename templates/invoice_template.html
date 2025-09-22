@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice</title>
+    <style>
+        /* Add your CSS here to match the design */
+        @page { margin-top: 0; }
+        body { font-family: sans-serif; margin: 0; }
+        .header { text-align: center; margin-bottom: 40px; }
+        .header h1 { margin: 0; font-size: 36px; color: #333; }
+        .header h2 { margin: 0; font-size: 14px; color: #777; }
+        .invoice-details { margin-bottom: 30px; }
+        .invoice-details table { width: 300px; border-collapse: collapse; }
+        .invoice-details td { padding: 5px; }
+        .items-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        .items-table th, .items-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .items-table th { background-color: #f2f2f2; }
+        .total-section { text-align: right; }
+        .logo { max-width: 600px;}
+        .payment-info {
+            margin-top: 50px;
+        }
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 10px;
+            color: #777;
+        }
+        .footer-item {
+            display: inline-block;
+            margin: 0 10px; /* Adds space between items */
+        }
+        .footer-icon {
+            height: 10px; /* Adjust size as needed */
+            width: auto;
+            vertical-align: middle;
+            margin-right: 5px; /* Space between icon and text */
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="{{ logo_url }}" alt="Chloris & Peony Logo" class="logo">
+    </div>
+
+    <p>Kepada Yth:<br>{{ customer_name }}</p>
+
+    <div class="invoice-details">
+        <table>
+            <tr><td><strong>INVOICE NO</strong></td><td>: {{ invoice_number }}</td></tr>
+            <tr><td><strong>Tgl</strong></td><td>: {{ date }}</td></tr>
+        </table>
+    </div>
+
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Keterangan</th>
+                <th>Harga</th>
+                <th>Qtty</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ item.description | replace('\n', '<br>') | safe }}</td>
+                <td>Rp {{ '{:,.2f}'.format(item.price) }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>Rp {{ '{:,.2f}'.format(item.total) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="total-section">
+        <h3>Total: Rp {{ '{:,.2f}'.format(total) }}</h3>
+    </div>
+
+    <div class="payment-info">
+        <p>
+            <strong>Payment</strong><br>
+            BCA Account No:<br>
+            0931460667 <br>
+            Florence Irena Tjhin
+        </p>
+    </div>
+
+    <footer class="footer">
+        <p>
+            <span class="footer-item">
+                <img src="{{ whatsapp_icon_url }}" class="footer-icon">
+                0818 183828
+            </span>
+            <span class="footer-item">
+                <img src="{{ mail_icon_url }}" class="footer-icon">
+                chlorisandpeony@gmail.com
+            </span>
+            <span class="footer-item">
+                <img src="{{ instagram_icon_url }}" class="footer-icon">
+                chloris_peony_florist
+            </span>
+        </p>
+    </footer>
+
+</body>
+</html>

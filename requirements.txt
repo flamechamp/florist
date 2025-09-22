@@ -11,3 +11,6 @@ psycopg2-binary
 # For data validation and settings management
 pydantic
 pydantic-settings
+
+WeasyPrint
+Jinja2

@@ -68,3 +68,8 @@ class PurchaseOrderItem(Base):
     purchase_price = Column(Float, nullable=False)
     purchase_order = relationship("PurchaseOrder", back_populates="items")
     inventory_item = relationship("InventoryItem")
+
+class InvoiceCounter(Base):
+    __tablename__ = "invoice_counter"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    last_invoice_number = Column(Integer, default=0, nullable=False)
